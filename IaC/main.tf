@@ -27,7 +27,7 @@ resource "aws_internet_gateway" "main" {
 resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "172.31.2.0/24"
-  availability_zone      = "eu-central-1a"
+  availability_zone       = "eu-central-1a"
   map_public_ip_on_launch = true
 
   tags = {
@@ -170,10 +170,10 @@ resource "aws_s3_bucket_policy" "cloudtrail" {
 
 resource "aws_cloudtrail" "main" {
   name                          = "org-trail"
-  s3_bucket_name               = aws_s3_bucket.cloudtrail.bucket
+  s3_bucket_name                = aws_s3_bucket.cloudtrail.bucket
   include_global_service_events = true
-  is_multi_region_trail        = true
-  enable_logging              = true
+  is_multi_region_trail         = true
+  enable_logging                = true
 
   depends_on = [
     aws_s3_bucket_policy.cloudtrail
