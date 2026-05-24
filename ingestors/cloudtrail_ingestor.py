@@ -4,9 +4,12 @@ import json
 import os
 from datetime import datetime, timezone, timedelta
 
-BUCKET = "aws-cloudtrail-logs-123599503689-5a6fc49a"
 REGION = "eu-central-1"
 ACCOUNT = "123599503689"
+ssm = boto3.client("ssm", region_name=REGION)
+BUCKET = ssm.get_parameter(
+    Name="/logging/cloudtrail/bucket")
+    ["Parameter"]["Value"]
 
 # Tracks which keys we've already processed so we don't re-alert
 STATE_FILE = os.path.join(os.path.dirname(__file__), ".cloudtrail_state")
