@@ -10,10 +10,14 @@ Deployed and validated against real traffic — detected active internet scannin
 
 Pulls log data from two AWS sources on a configurable look-back window, normalises the events into a shared format, runs 9 detection rules across both sources, and writes a severity-sorted markdown findings report.
 
-```
-CloudTrail (API/IAM events) ──┐
-                               ├── S3 buckets ── ingestors ── rules engine ── reporter
-VPC Flow Logs (network)   ────┘
+```mermaid
+flowchart LR
+  CT[CloudTrail<br/>(API/IAM events)] --> CTB[(CloudTrail S3 bucket)]
+  FL[VPC Flow Logs<br/>(network)] --> FLB[(Flow Logs S3 bucket)]
+  CTB --> ING[Ingestors]
+  FLB --> ING
+  ING --> RULES[Rules engine]
+  RULES --> REP[Reporter]
 ```
 
 The pipeline runs locally using boto3 with read-only IAM credentials. No extra AWS services required beyond the free tier infrastructure already used to generate the logs.
@@ -178,6 +182,12 @@ Wait 10-15 minutes for logs to land in S3, then run `python main.py`.
 **Alert deduplication in rules** — the root account rule groups all root API calls into a single finding with a count and unique action summary, avoiding alert fatigue from the 200+ individual API calls a typical console session generates.
 
 **Read-only credentials** — the IAM user used at runtime has no write permissions anywhere. It cannot modify logs, delete findings, or interact with the EC2 instance.
+
+---
+
+## Design Decisions & Tradeoffs
+
+**Python + boto3 instead of a heavy SIEM** — To minimize cloud compute costs while demonstrating raw API log ingestion and parsing mechanics. This keeps the lab lightweight, free-tier friendly, and focused on detection logic rather than operating a separate SIEM stack.
 
 ---
 
